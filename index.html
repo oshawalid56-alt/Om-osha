@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مفروشات أم أوشا</title>
+<style>
+:root{
+  --bg:#faf8f5; --card:#fff; --ink:#2a2016; --sub:#84776a; --line:#e9e1d6;
+  --accent:#a6511e; --accent-ink:#fff; --good:#166534; --good-bg:#dcfce7;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#181410;--card:#231d17;--ink:#f2ece3;--sub:#a99d8d;--line:#3c332a;--accent:#e08a4f;--accent-ink:#1c1712;--good:#4ade80;--good-bg:#14301f;}}
+:root[data-theme="dark"]{--bg:#181410;--card:#231d17;--ink:#f2ece3;--sub:#a99d8d;--line:#3c332a;--accent:#e08a4f;--accent-ink:#1c1712;--good:#4ade80;--good-bg:#14301f;}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Segoe UI',Tahoma,Arial,sans-serif;}
+header{position:sticky;top:0;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px));background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+.headtop{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:18px;margin:0}
+.iconbtn{position:relative;border:1px solid var(--line);background:var(--card);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer}
+.badge{position:absolute;top:-6px;left:-6px;background:var(--accent);color:var(--accent-ink);font-size:11px;border-radius:10px;padding:1px 6px}
+nav{display:flex;gap:6px;margin-top:10px;overflow-x:auto}
+nav button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap}
+nav button.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{padding:16px;max-width:640px;margin:0 auto}
+.cats{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.cats button{border:1px solid var(--line);background:var(--card);padding:6px 12px;border-radius:16px;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap}
+.cats button.active{background:var(--ink);color:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:5px}
+.emoji{font-size:34px;text-align:center}
+.prodimg{width:100%;height:80px;object-fit:cover;border-radius:8px}
+.name{font-weight:600;font-size:14px}
+.price{color:var(--accent);font-weight:700;font-size:15px}
+.stock{color:var(--sub);font-size:12px}
+button.buy{margin-top:4px;background:var(--accent);color:var(--accent-ink);border:none;padding:8px;border-radius:9px;font-size:13px;cursor:pointer}
+button.buy:disabled{opacity:.4}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .num{font-size:24px;font-weight:800}
+.stat .label{color:var(--sub);font-size:12px;margin-top:4px}
+.profit{color:var(--good)}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:16px;left:16px;max-width:400px;margin:auto;background:var(--good-bg);color:var(--good);padding:10px 14px;border-radius:10px;font-size:13px;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-weight:600}
+.hint{color:var(--sub);font-size:12px;margin-top:14px;line-height:1.7}
+.section-title{font-size:14px;color:var(--sub);margin:18px 0 8px;font-weight:600}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:40}
+.overlay.show{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:18px;max-height:85vh;overflow-y:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet h2{margin:0 0 12px;font-size:17px}
+.cartrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.cartrow .n{flex:1;font-size:13px}
+.qtybtn{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.close{float:left;border:none;background:none;font-size:20px;color:var(--sub);cursor:pointer}
+.field{margin:10px 0}
+.field label{display:block;font-size:12px;color:var(--sub);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-size:14px}
+.paytabs{display:flex;gap:8px;margin:10px 0}
+.paytabs button{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+.paytabs button.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.bigbtn{width:100%;background:var(--accent);color:var(--accent-ink);border:none;padding:12px;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:12px}
+.stars{font-size:26px;letter-spacing:4px;cursor:pointer}
+.star{color:var(--line)}
+.star.on{color:#f5a524}
+.chatbtn{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:16px;background:var(--accent);color:var(--accent-ink);border:none;width:50px;height:50px;border-radius:50%;font-size:22px;cursor:pointer;z-index:30}
+.chatwin{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:16px;width:280px;max-width:80vw;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:none;z-index:31;max-height:60vh;overflow-y:auto}
+.chatwin.show{display:block}
+.msg{padding:7px 10px;border-radius:10px;margin:5px 0;font-size:13px;max-width:90%}
+.msg.bot{background:var(--bg);border:1px solid var(--line)}
+.msg.user{background:var(--accent);color:var(--accent-ink);margin-right:auto}
+.editbar{display:flex;gap:6px;margin-top:6px}
+.editbar button{flex:1;font-size:11px;padding:5px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;
+  background:linear-gradient(160deg,#7c2d12,#a6511e 45%,#e08a4f 100%);overflow:hidden;transition:opacity .5s ease;padding:24px}
+#splash .fold{position:absolute;inset:0;opacity:.35}
+#splash .brand{font-size:30px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 10px rgba(0,0,0,.25);z-index:2}
+#splash .tag{font-size:14px;opacity:.9;margin-top:8px;z-index:2}
+#splash .logo{font-size:56px;z-index:2;margin-bottom:6px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
+#splash button{margin-top:26px;background:#fff;color:#7c2d12;border:none;padding:11px 26px;border-radius:24px;font-size:14px;font-weight:700;cursor:pointer;z-index:2}
+#splash.hide{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="splash">
+  <svg class="fold" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,120 C100,180 300,60 400,140 L400,0 L0,0 Z" fill="#fff" opacity="0.15"/>
+    <path d="M0,260 C120,320 280,200 400,280 L400,140 C300,60 100,180 0,120 Z" fill="#fff" opacity="0.1"/>
+    <path d="M0,800 C120,700 280,780 400,700 L400,800 Z" fill="#fff" opacity="0.12"/>
+    <path d="M0,700 C140,620 260,740 400,650 L400,700 C280,780 120,700 0,800 Z" fill="#fff" opacity="0.08"/>
+  </svg>
+  <div class="logo">🛏️✨</div>
+  <div class="brand">مفروشات أم أوشا</div>
+  <div class="tag">فخامة تلمسها كل ليلة — ملايات ولحف بأجود الأقمشة</div>
+  <button onclick="closeSplash()">ادخل المتجر</button>
+</div>
+<header>
+  <div class="headtop">
+    <h1 id="storeName">🛏️ مفروشات أم أوشا</h1>
+    <button class="iconbtn" onclick="openCart()">🛒<span class="badge" id="cartBadge" style="display:none">0</span></button>
+  </div>
+  <nav>
+    <button id="tabStore" class="active">المتجر</button>
+  </nav>
+</header>
+<main>
+  <div id="storeView"></div>
+  <div id="adminView" style="display:none"></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<!-- عربة التسوق / الدفع -->
+<div class="overlay" id="cartOverlay"><div class="sheet" id="cartSheet"></div></div>
+<!-- التقييم -->
+<div class="overlay" id="reviewOverlay"><div class="sheet" id="reviewSheet"></div></div>
+<!-- نموذج المنتج (إضافة/تعديل) -->
+<div class="overlay" id="productOverlay"><div class="sheet" id="productSheet"></div></div>
+<!-- صندوق عام (دخول أدمن / تأكيدات) -->
+<div class="overlay" id="modalOverlay"><div class="sheet" id="modalSheet"></div></div>
+
+<!-- بوت خدمة العملاء -->
+<button class="chatbtn" onclick="toggleChat()">💬</button>
+<div class="chatwin" id="chatWin">
+  <div id="chatMsgs"></div>
+  <div class="field"><input id="chatInput" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter')sendChat()"></div>
+  <button class="bigbtn" style="margin-top:4px" onclick="sendChat()">إرسال</button>
+</div>
+
+<script>
+/* ---------- بيانات أساسية ---------- */
+const todayKey = () => new Date().toISOString().slice(0,10);
+const K = {products:'shop_products', stats:'shop_stats_', reviews:'shop_reviews', support:'shop_support', cart:'shop_cart', name:'shop_name'};
+
+function loadProducts(){
+  let p = JSON.parse(localStorage.getItem(K.products) || 'null');
+  if(!p){
+    p = [
+      {id:1, cat:'ملايات', name:'ملاية قطن مفرد', emoji:'🛏️', price:350, cost:180, stock:25},
+      {id:2, cat:'ملايات', name:'ملاية ساتان مفرد', emoji:'🛏️', price:480, cost:260, stock:15},
+      {id:3, cat:'لحاف', name:'لحاف صيفي خفيف', emoji:'🧣', price:500, cost:300, stock:20},
+      {id:4, cat:'لحاف', name:'لحاف شتوي فرو', emoji:'🧸', price:750, cost:450, stock:10},
+    ];
+    localStorage.setItem(K.products, JSON.stringify(p));
+  }
+  return p;
+}
+const saveProducts = p => localStorage.setItem(K.products, JSON.stringify(p));
+function loadStats(day){
+  const key = K.stats+day;
+  let s = JSON.parse(localStorage.getItem(key)||'null');
+  if(!s){ s={visits:0,customers:0,itemsSold:0,revenue:0,cost:0,timeTotal:0,timeCount:0}; localStorage.setItem(key,JSON.stringify(s)); }
+  return s;
+}
+const saveStats = (day,s) => localStorage.setItem(K.stats+day, JSON.stringify(s));
+const loadReviews = () => JSON.parse(localStorage.getItem(K.reviews)||'[]');
+const saveReviews = r => localStorage.setItem(K.reviews, JSON.stringify(r));
+const loadSupport = () => JSON.parse(localStorage.getItem(K.support)||'[]');
+const saveSupport = s => localStorage.setItem(K.support, JSON.stringify(s));
+function loadSettings(){
+  let s = JSON.parse(localStorage.getItem('shop_settings')||'null');
+  if(!s){ s={depositPercent:20, shippingFee:50}; localStorage.setItem('shop_settings', JSON.stringify(s)); }
+  return s;
+}
+const saveSettings = s => localStorage.setItem('shop_settings', JSON.stringify(s));
+function updateSetting(key,val){
+  const s=loadSettings(); s[key]=Number(val)||0; saveSettings(s);
+  showToast('تم تحديث الإعداد'); 
+}
+window.updateSetting = updateSetting;
+let cart = JSON.parse(localStorage.getItem(K.cart)||'[]');
+const saveCart = () => localStorage.setItem(K.cart, JSON.stringify(cart));
+
+/* ---------- تتبع الزيارة ووقت البقاء ---------- */
+const day = todayKey();
+const sessStart = Date.now();
+if(!sessionStorage.getItem('visited_'+day)){
+  const s = loadStats(day); s.visits+=1; saveStats(day,s);
+  sessionStorage.setItem('visited_'+day,'1');
+}
+function flushTime(){
+  const secs = Math.round((Date.now()-sessStart)/1000);
+  if(sessionStorage.getItem('timeLogged_'+day)) return;
+  const s = loadStats(day); s.timeTotal += secs; s.timeCount += 1; saveStats(day,s);
+  sessionStorage.setItem('timeLogged_'+day,'1');
+}
+window.addEventListener('beforeunload', flushTime);
+setTimeout(()=>{ // بعد دقيقة تقييم اختياري لو ما اشتريش
+  if(!sessionStorage.getItem('reviewShown')) openReview('زيارة');
+}, 60000);
+
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ---------- المتجر ---------- */
+let activeCat = 'الكل';
+function renderStore(){
+  const products = loadProducts();
+  const cats = ['الكل', ...new Set(products.map(p=>p.cat))];
+  const list = activeCat==='الكل' ? products : products.filter(p=>p.cat===activeCat);
+  const el = document.getElementById('storeView');
+  el.innerHTML =
+    '<div class="cats">'+cats.map(c=>`<button class="${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</button>`).join('')+'</div>'+
+    '<div class="grid">'+list.map(p=>`
+      <div class="card">
+        ${p.image?`<img class="prodimg" src="${p.image}">`:`<div class="emoji">${p.emoji}</div>`}
+        <div class="name">${p.name}</div>
+        <div class="price">${p.price} جنيه</div>
+        <div class="stock">متوفر: ${p.stock} قطعة</div>
+        <button class="buy" ${p.stock<=0?'disabled':''} onclick="addToCart(${p.id})">${p.stock<=0?'خلص':'أضف للعربة'}</button>
+      </div>`).join('')+'</div>';
+}
+function setCat(c){ activeCat=c; renderStore(); }
+window.setCat = setCat;
+
+function addToCart(id){
+  const item = cart.find(c=>c.id===id);
+  if(item) item.qty+=1; else cart.push({id,qty:1});
+  saveCart(); updateCartBadge();
+  showToast('أضيف للعربة 🛒');
+}
+window.addToCart = addToCart;
+function updateCartBadge(){
+  const n = cart.reduce((a,c)=>a+c.qty,0);
+  const b = document.getElementById('cartBadge');
+  b.style.display = n>0?'inline-block':'none'; b.textContent=n;
+}
+
+/* ---------- العربة والدفع ---------- */
+let payMethod='cash', shipping='home';
+function openCart(){
+  renderCartSheet();
+  document.getElementById('cartOverlay').classList.add('show');
+}
+function closeCart(){ document.getElementById('cartOverlay').classList.remove('show'); }
+window.openCart=openCart; window.closeCart=closeCart;
+
+function cartTotal(){
+  const products = loadProducts();
+  return cart.reduce((sum,c)=>{ const p=products.find(x=>x.id===c.id); return p? sum+p.price*c.qty : sum; },0);
+}
+function renderCartSheet(){
+  const products = loadProducts();
+  const sheet = document.getElementById('cartSheet');
+  if(cart.length===0){
+    sheet.innerHTML = '<button class="close" onclick="closeCart()">×</button><h2>العربة فاضية</h2><p class="hint">أضف منتجات من المتجر الأول.</p>';
+    return;
+  }
+  const settings = loadSettings();
+  const shipFee = shipping==='home'?settings.shippingFee:0;
+  const total = cartTotal();
+  const deposit = Math.round(total*settings.depositPercent/100);
+  sheet.innerHTML = `
+    <button class="close" onclick="closeCart()">×</button>
+    <h2>عربة التسوق</h2>
+    ${cart.map(c=>{ const p=products.find(x=>x.id===c.id); if(!p) return ''; return `
+      <div class="cartrow">
+        <span class="n">${p.name} — ${p.price} جنيه</span>
+        <button class="qtybtn" onclick="changeQty(${p.id},-1)">−</button>
+        <span>${c.qty}</span>
+        <button class="qtybtn" onclick="changeQty(${p.id},1)">+</button>
+      </div>`; }).join('')}
+    <div class="section-title">الشحن</div>
+    <div class="paytabs">
+      <button class="${shipping==='home'?'active':''}" onclick="setShip('home')">شحن للمنزل (+${settings.shippingFee})</button>
+      <button class="${shipping==='pickup'?'active':''}" onclick="setShip('pickup')">استلام من المحل</button>
+    </div>
+    ${shipping==='home'?'<div class="field"><label>العنوان</label><input id="addrInput" placeholder="المحافظة، الحي، الشارع"></div>':''}
+    <div class="section-title">طريقة الدفع</div>
+    <div class="paytabs">
+      <button class="${payMethod==='cash'?'active':''}" onclick="setPay('cash')">نقدي (عربون تحويل)</button>
+      <button class="${payMethod==='visa'?'active':''}" onclick="setPay('visa')">فيزا</button>
+    </div>
+    ${payMethod==='cash'? `<p class="hint">هيتطلب دفع عربون ${deposit} جنيه (${settings.depositPercent}% من الإجمالي) تحويل، والباقي نقدي عند الاستلام.</p>
+      <div class="field"><label>رقم عملية التحويل (بعد التحويل)</label><input id="transferCode" placeholder="مثال: 123456"></div>`
+      : `<p class="hint">بعد تأكيد الطلب هيوصلك لينك دفع آمن بالفيزا (Paymob) على واتساب خلال دقايق.</p>
+      <div class="field"><label>رقم الواتساب</label><input id="waNum" placeholder="01xxxxxxxxx"></div>`}
+    <table>
+      <tr><th>الإجمالي</th><td>${total} جنيه</td></tr>
+      <tr><th>الشحن</th><td>${shipFee} جنيه</td></tr>
+      <tr><th>المطلوب الآن</th><td>${payMethod==='cash'? deposit+' جنيه (عربون)' : (total+shipFee)+' جنيه'}</td></tr>
+    </table>
+    <button class="bigbtn" onclick="confirmOrder()">تأكيد الطلب</button>
+  `;
+}
+function changeQty(id,d){
+  const item=cart.find(c=>c.id===id);
+  if(!item)return;
+  item.qty+=d;
+  if(item.qty<=0) cart=cart.filter(c=>c.id!==id);
+  saveCart(); updateCartBadge(); renderCartSheet();
+}
+function setShip(s){ shipping=s; renderCartSheet(); }
+function setPay(p){ payMethod=p; renderCartSheet(); }
+window.changeQty=changeQty; window.setShip=setShip; window.setPay=setPay;
+
+function confirmOrder(){
+  if(payMethod==='cash' && !document.getElementById('transferCode').value.trim()){
+    showToast('من فضلك اكتب رقم عملية التحويل'); return;
+  }
+  if(payMethod==='visa' && !document.getElementById('waNum').value.trim()){
+    showToast('من فضلك اكتب رقم الواتساب'); return;
+  }
+  if(shipping==='home' && !document.getElementById('addrInput').value.trim()){
+    showToast('من فضلك اكتب العنوان'); return;
+  }
+  const products = loadProducts();
+  const s = loadStats(day);
+  let firstOrder = !sessionStorage.getItem('custCounted_'+day);
+  let orderTotal = 0;
+  cart.forEach(c=>{
+    const p = products.find(x=>x.id===c.id);
+    if(!p) return;
+    p.stock = Math.max(0,p.stock-c.qty);
+    s.itemsSold += c.qty;
+    s.revenue += p.price*c.qty;
+    s.cost += p.cost*c.qty;
+    orderTotal += p.price*c.qty;
+  });
+  if(firstOrder){ s.customers+=1; sessionStorage.setItem('custCounted_'+day,'1'); }
+  if(payMethod==='visa'){
+    const orders = JSON.parse(localStorage.getItem('shop_pay_orders')||'[]');
+    orders.push({wa:document.getElementById('waNum').value.trim(), amount:orderTotal+(shipping==='home'?loadSettings().shippingFee:0), date:new Date().toISOString(), sent:false});
+    localStorage.setItem('shop_pay_orders', JSON.stringify(orders));
+  }
+  saveProducts(products); saveStats(day,s);
+  cart=[]; saveCart(); updateCartBadge();
+  closeCart();
+  showToast(payMethod==='visa' ? 'تم الطلب ✅ هيوصلك لينك الدفع على واتساب قريب' : 'تم تأكيد الطلب بنجاح ✅');
+  renderStore();
+  setTimeout(()=>openReview('شراء'),700);
+}
+window.confirmOrder = confirmOrder;
+
+/* ---------- التقييم ---------- */
+let chosenStars=0;
+function openReview(context){
+  sessionStorage.setItem('reviewShown','1');
+  chosenStars=0;
+  const sheet=document.getElementById('reviewSheet');
+  sheet.innerHTML=`
+    <button class="close" onclick="closeReview()">×</button>
+    <h2>${context==='شراء'?'قيّم تجربة الشراء':'عجبتك زيارتك للموقع؟'}</h2>
+    <div class="stars" id="starsRow"></div>
+    <div class="field"><label>تعليق (اختياري)</label><textarea id="reviewComment" rows="2"></textarea></div>
+    <button class="bigbtn" onclick="submitReview('${context}')">إرسال التقييم</button>
+  `;
+  renderStars();
+  document.getElementById('reviewOverlay').classList.add('show');
+}
+function closeReview(){ document.getElementById('reviewOverlay').classList.remove('show'); }
+function renderStars(){
+  const row=document.getElementById('starsRow');
+  row.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const span=document.createElement('span');
+    span.textContent='★'; span.className='star'+(i<=chosenStars?' on':'');
+    span.onclick=()=>{ chosenStars=i; renderStars(); };
+    row.appendChild(span);
+  }
+}
+function submitReview(context){
+  const reviews=loadReviews();
+  reviews.push({stars:chosenStars||5, comment:document.getElementById('reviewComment').value.trim(), context, date:new Date().toISOString()});
+  saveReviews(reviews);
+  closeReview();
+  showToast('شكراً لتقييمك 🙏');
+}
+window.openReview=openReview; window.closeReview=closeReview; window.submitReview=submitReview;
+
+/* ---------- بوت خدمة العملاء ---------- */
+function toggleChat(){ document.getElementById('chatWin').classList.toggle('show'); }
+window.toggleChat=toggleChat;
+function addMsg(text,who){
+  const box=document.getElementById('chatMsgs');
+  const d=document.createElement('div'); d.className='msg '+who; d.textContent=text;
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+if(document.getElementById('chatMsgs').children.length===0){
+  addMsg('أهلاً بيك في مفروشات أم أوشا 👋 تقدر تسألني عن الملايات، اللحف، الأسعار، أو الشحن.', 'bot');
+}
+function normalizeAr(s){
+  return s.replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
+}
+function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text) return;
+  addMsg(text,'user'); inp.value='';
+  const t=normalizeAr(text.toLowerCase());
+  const settings = loadSettings();
+  const has = (...words) => words.some(w=>t.includes(w));
+  let reply;
+  if(has('ملاي','مفارش','شرشف')) reply='عندنا ملايات قطن وساتان، الأسعار والكميات المتاحة موضحة تحت كل موديل في صفحة المتجر.';
+  else if(has('لحاف','لحف','لحافيه','بطانيه','كونتور')) reply='عندنا لحاف صيفي خفيف ولحاف شتوي فرو، الأسعار موضحة في المتجر مباشرة.';
+  else if(has('شحن','توصيل','هتوصل','تشحن')) reply='الشحن للمنزل بـ'+settings.shippingFee+' جنيه، أو تقدر تستلم من المحل مجاناً.';
+  else if(has('دفع','فيزا','كارت','تحويل','عربون')) reply='تقدر تدفع فيزا أونلاين، أو نقدي عند الاستلام بعد دفع عربون '+settings.depositPercent+'% تحويل.';
+  else if(has('سعر','اسعار','بكام','تكلفه','فلوس','ثمن')) reply='الأسعار موضحة تحت كل منتج في صفحة المتجر مباشرة.';
+  else if(has('متوفر','موجود','فاضل','كميه','مقاس')) reply='الكمية المتوفرة من كل موديل مكتوبة تحت المنتج في المتجر مباشرة.';
+  else if(has('مسؤول','خدمه العملاء','اتكلم مع حد','بشر')) reply='تمام، هحول رسالتك للمسؤول وهيتواصل معاك في أقرب وقت.';
+  else reply=null;
+  if(reply){ setTimeout(()=>addMsg(reply,'bot'),400); }
+  else {
+    setTimeout(()=>addMsg('مش متأكد من الإجابة، هحول سؤالك للمسؤول وهيتواصل معاك.','bot'),400);
+    const sup=loadSupport(); sup.push({msg:text,date:new Date().toISOString(),answered:false}); saveSupport(sup);
+  }
+}
+window.sendChat=sendChat;
+
+/* ---------- لوحة التحكم: نموذج المنتج (مع رفع صورة) ---------- */
+let editingProductId = null, tempImage = '';
+function openProductForm(id){
+  editingProductId = id || null;
+  const products = loadProducts();
+  const p = id ? products.find(x=>x.id===id) : null;
+  tempImage = p ? (p.image||'') : '';
+  renderProductForm();
+  document.getElementById('productOverlay').classList.add('show');
+}
+function closeProductForm(){ document.getElementById('productOverlay').classList.remove('show'); }
+function renderProductForm(){
+  const products = loadProducts();
+  const p = editingProductId ? products.find(x=>x.id===editingProductId) : {name:'',cat:'ملايات',price:'',cost:'',stock:'',emoji:'🛏️'};
+  const sheet = document.getElementById('productSheet');
+  sheet.innerHTML = `
+    <button class="close" onclick="closeProductForm()">×</button>
+    <h2>${editingProductId?'تعديل المنتج':'منتج جديد'}</h2>
+    <div style="text-align:center">${tempImage?`<img src="${tempImage}" style="max-width:120px;border-radius:10px">`:`<div class="emoji">${p.emoji||'🛏️'}</div>`}</div>
+    <div class="field"><label>صورة المنتج</label><input type="file" accept="image/*" onchange="handleImageUpload(event)"></div>
+    <div class="field"><label>اسم المنتج</label><input id="pfName" value="${p.name}"></div>
+    <div class="field"><label>التصنيف</label>
+      <select id="pfCat">
+        <option value="ملايات" ${p.cat==='ملايات'?'selected':''}>ملايات</option>
+        <option value="لحاف" ${p.cat==='لحاف'?'selected':''}>لحاف</option>
+      </select>
+    </div>
+    <div class="field"><label>السعر (جنيه)</label><input id="pfPrice" type="number" value="${p.price}"></div>
+    <div class="field"><label>سعر التكلفة (جنيه)</label><input id="pfCost" type="number" value="${p.cost}"></div>
+    <div class="field"><label>الكمية المتوفرة</label><input id="pfStock" type="number" value="${p.stock}"></div>
+    <button class="bigbtn" onclick="saveProductForm()">حفظ</button>
+    ${editingProductId?'<button class="bigbtn" style="background:#b91c1c" onclick="deleteProductForm()">حذف المنتج</button>':''}
+  `;
+}
+function handleImageUpload(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{ tempImage = reader.result; renderProductForm(); };
+  reader.readAsDataURL(file);
+}
+function saveProductForm(){
+  const name = document.getElementById('pfName').value.trim();
+  if(!name){ showToast('اكتب اسم المنتج'); return; }
+  const cat = document.getElementById('pfCat').value;
+  const price = Number(document.getElementById('pfPrice').value)||0;
+  const cost = Number(document.getElementById('pfCost').value)||0;
+  const stock = Number(document.getElementById('pfStock').value)||0;
+  const products = loadProducts();
+  if(editingProductId){
+    const p = products.find(x=>x.id===editingProductId);
+    Object.assign(p,{name,cat,price,cost,stock,image:tempImage});
+  } else {
+    const id = Math.max(0,0,...products.map(x=>x.id))+1;
+    products.push({id,name,cat,price,cost,stock,image:tempImage,emoji:cat==='لحاف'?'🧣':'🛏️'});
+  }
+  saveProducts(products);
+  closeProductForm(); renderAdmin(); renderStore();
+  showToast('تم الحفظ');
+}
+function deleteProductForm(){
+  const products = loadProducts();
+  const p = products.find(x=>x.id===editingProductId);
+  showModal(`
+    <h2>تأكيد الحذف</h2>
+    <p class="hint">متأكد إنك عايز تحذف "${p?p.name:'المنتج'}"؟ الإجراء ده مش هينعمله تراجع.</p>
+    <button class="bigbtn" style="background:#b91c1c" onclick="reallyDeleteProduct()">نعم، احذف</button>
+    <button class="bigbtn" style="background:var(--card);color:var(--ink);border:1px solid var(--line)" onclick="hideModal()">إلغاء</button>
+  `);
+}
+function reallyDeleteProduct(){
+  saveProducts(loadProducts().filter(p=>p.id!==editingProductId));
+  hideModal(); closeProductForm(); renderAdmin(); renderStore();
+}
+window.reallyDeleteProduct = reallyDeleteProduct;
+window.openProductForm=openProductForm; window.closeProductForm=closeProductForm;
+window.handleImageUpload=handleImageUpload; window.saveProductForm=saveProductForm; window.deleteProductForm=deleteProductForm;
+function markPaySent(dateStr){
+  const orders=JSON.parse(localStorage.getItem('shop_pay_orders')||'[]');
+  const o=orders.find(x=>x.date===dateStr); if(o)o.sent=true;
+  localStorage.setItem('shop_pay_orders', JSON.stringify(orders));
+  renderAdmin(); showToast('تم التحديث');
+}
+window.markPaySent = markPaySent;
+function changeAdminPass(){
+  const v = document.getElementById('newPassInp').value.trim();
+  if(!v){ showToast('اكتب كلمة سر'); return; }
+  localStorage.setItem('shop_admin_pass', v);
+  showToast('اتغيرت كلمة السر ✅');
+}
+window.changeAdminPass = changeAdminPass;
+
+function renderAdmin(){
+  const s = loadStats(day);
+  const profit = s.revenue>0 ? (((s.revenue-s.cost)/s.revenue)*100).toFixed(1) : '0.0';
+  const avgTime = s.timeCount>0 ? Math.round(s.timeTotal/s.timeCount) : 0;
+  const reviews = loadReviews();
+  const avgStars = reviews.length ? (reviews.reduce((a,r)=>a+r.stars,0)/reviews.length).toFixed(1) : '—';
+  const support = loadSupport();
+  const products = loadProducts();
+  const settings = loadSettings();
+  const el=document.getElementById('adminView');
+  el.innerHTML=`
+    <button class="bigbtn" style="background:var(--card);color:var(--ink);border:1px solid var(--line);margin-bottom:10px" onclick="showStoreView()">← رجوع للمتجر</button>
+    <div class="stats">
+      <div class="stat"><div class="num">${s.visits}</div><div class="label">زوار اليوم</div></div>
+      <div class="stat"><div class="num">${s.customers}</div><div class="label">عملاء اليوم</div></div>
+      <div class="stat"><div class="num">${s.itemsSold}</div><div class="label">قطع اتباعت</div></div>
+      <div class="stat"><div class="num profit">${profit}%</div><div class="label">نسبة الربح اليوم</div></div>
+      <div class="stat"><div class="num">${avgTime}s</div><div class="label">متوسط وقت الجلسة</div></div>
+      <div class="stat"><div class="num">${avgStars} ⭐</div><div class="label">متوسط التقييم (${reviews.length})</div></div>
+    </div>
+    <div class="section-title">ملخص مالي اليوم</div>
+    <table>
+      <tr><th>الإيراد</th><td>${s.revenue} جنيه</td></tr>
+      <tr><th>التكلفة</th><td>${s.cost} جنيه</td></tr>
+      <tr><th>صافي الربح</th><td>${s.revenue-s.cost} جنيه</td></tr>
+    </table>
+    <div class="section-title">أمان لوحة التحكم</div>
+    <div class="field"><label>تغيير كلمة السر</label><input id="newPassInp" type="password" placeholder="كلمة سر جديدة"></div>
+    <button class="bigbtn" onclick="changeAdminPass()">حفظ كلمة السر</button>
+    <div class="section-title">إعدادات الدفع والشحن</div>
+    <div class="field"><label>نسبة العربون (%)</label><input type="number" value="${settings.depositPercent}" onchange="updateSetting('depositPercent',this.value)"></div>
+    <div class="field"><label>رسوم الشحن للمنزل (جنيه)</label><input type="number" value="${settings.shippingFee}" onchange="updateSetting('shippingFee',this.value)"></div>
+    <div class="section-title">إدارة المنتجات</div>
+    ${products.map(p=>`
+      <div class="cartrow" style="flex-direction:column;align-items:stretch">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          ${p.image?`<img src="${p.image}" style="width:36px;height:36px;object-fit:cover;border-radius:6px">`:`<span>${p.emoji}</span>`}
+          <b style="flex:1;margin:0 8px">${p.name}</b><span>${p.price} جنيه</span>
+        </div>
+        <div class="stock">${p.cat} — متوفر: ${p.stock} — تكلفة: ${p.cost}</div>
+        <div class="editbar"><button onclick="openProductForm(${p.id})">تعديل / صورة</button></div>
+      </div>`).join('')}
+    <button class="bigbtn" onclick="openProductForm()">+ إضافة منتج جديد</button>
+    <div class="section-title">طلبات فيزا محتاجة إرسال لينك دفع (Paymob)</div>
+    ${(()=>{ const orders=JSON.parse(localStorage.getItem('shop_pay_orders')||'[]'); const pending=orders.filter(o=>!o.sent);
+      if(pending.length===0) return '<p class="hint">مفيش طلبات فيزا معلقة دلوقتي.</p>';
+      return pending.map((o,i)=>`<div class="cartrow"><span class="n">واتساب: ${o.wa} — المبلغ: ${o.amount} جنيه</span>
+        <button class="qtybtn" style="width:auto;border-radius:8px;padding:0 8px;font-size:11px" onclick="markPaySent('${o.date}')">تم الإرسال</button></div>`).join(''); })()}
+    <div class="section-title">رسائل خدمة العملاء المحوّلة (${support.length})</div>
+    ${support.length===0?'<p class="hint">لا يوجد استفسارات محتاجة متابعة.</p>':
+      support.map(m=>`<div class="cartrow"><span class="n">${m.msg}</span></div>`).join('')}
+    <p class="hint">البيانات هنا محسوبة من هذا المتصفح فقط (نموذج تجريبي). في الموقع الحقيقي هتتجمع من كل الزوار في قاعدة بيانات مركزية.</p>
+  `;
+}
+
+/* ---------- صندوق عام بديل لنوافذ المتصفح ---------- */
+function showModal(html){
+  document.getElementById('modalSheet').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function hideModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+window.showModal=showModal; window.hideModal=hideModal;
+
+/* ---------- عرض المتجر / الرجوع إليه ---------- */
+function showStoreView(){
+  document.getElementById('storeView').style.display='block';
+  document.getElementById('adminView').style.display='none';
+}
+window.showStoreView = showStoreView;
+document.getElementById('tabStore').onclick = showStoreView;
+
+/* ---------- دخول سري للوحة التحكم (اضغط اسم المتجر 5 مرات) ---------- */
+let secretTaps=0, secretTimer=null;
+document.getElementById('storeName').addEventListener('click', ()=>{
+  secretTaps++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(()=>{ secretTaps=0; }, 2000);
+  if(secretTaps>=5){ secretTaps=0; openAdminGate(); }
+});
+
+function openAdminGate(){
+  if(sessionStorage.getItem('isAdmin')==='1'){ showAdminView(); return; }
+  showModal(`
+    <button class="close" onclick="hideModal()">×</button>
+    <h2>🔒 دخول لوحة التحكم</h2>
+    <div class="field"><label>كلمة السر</label><input id="adminPassInp" type="password" onkeydown="if(event.key==='Enter')submitAdminPass()"></div>
+    <button class="bigbtn" onclick="submitAdminPass()">دخول</button>
+  `);
+  setTimeout(()=>document.getElementById('adminPassInp')?.focus(), 100);
+}
+function submitAdminPass(){
+  const v = document.getElementById('adminPassInp').value;
+  const saved = localStorage.getItem('shop_admin_pass') || '1234';
+  if(v !== saved){ showToast('كلمة السر غلط'); return; }
+  sessionStorage.setItem('isAdmin','1');
+  hideModal();
+  showAdminView();
+}
+function showAdminView(){
+  document.getElementById('storeView').style.display='none';
+  document.getElementById('adminView').style.display='block';
+  renderAdmin();
+}
+window.openAdminGate=openAdminGate; window.submitAdminPass=submitAdminPass; window.showAdminView=showAdminView;
+
+renderStore(); updateCartBadge();
+
+/* ---------- شاشة الاستقبال ---------- */
+function closeSplash(){
+  const s = document.getElementById('splash');
+  if(!s) return;
+  s.classList.add('hide');
+  setTimeout(()=>s.remove(), 550);
+}
+window.closeSplash = closeSplash;
+setTimeout(closeSplash, 2800);
+</script>
+</body>
+</html>
